@@ -1,18 +1,19 @@
-# 🛡️ Grievances Connect
+# 🛡️ Grievances Connect (MERN Stack + Gemini AI)
 
-**Grievances Connect** is a premium, fully-functional, role-based College Grievance Redressal and Management System. It allows Students to lodge grievances, track their progress, communicate directly with handlers, and automatically escalates unresolved complaints based on timeline SLA requirements.
+**Grievances Connect** is a premium, fully-functional, role-based College Grievance Redressal and Management System. Built on the **MERN (MongoDB, Express, React, Node.js) Stack**, the application features a **Google Gemini AI Copilot** to provide smart auto-summarization, sentiment analysis, priority classification, and automated resolution drafting. 
 
-The application features a modern React + Vite frontend connected to a robust Spring Boot backend with PostgreSQL.
+The system guarantees administrative accountability through a background **Auto-Escalation SLA Engine** that automatically sends reminders and escalates inactive grievances level-by-level (Staff ➔ HOD ➔ Principal) according to predefined timeline milestones.
 
 ---
 
 ## 🛠️ Architecture & Grievance Lifecycle
 
-The lifecycle of a grievance is designed to ensure accountability. Below is the workflow diagram:
+The grievance lifecycle is designed to ensure accountability. Below is the workflow diagram:
 
 ```mermaid
 graph TD
-    A[Student lodges grievance] -->|Assigned to Staff| B[OPEN Status]
+    A[Student lodges grievance] -->|AI analyzes text| AI[Ingest Analysis & Summary]
+    AI -->|Assigned to Staff| B[OPEN Status]
     B -->|2 Days Inactivity| C[Staff Email Reminder]
     B -->|Staff marks In Progress| D[IN PROGRESS Status]
     B -->|4 Days Inactivity| E[Auto-Escalate to HOD]
@@ -28,59 +29,67 @@ graph TD
 
 ## 🌟 Key Capabilities Implemented
 
-### 1. Role-Based Portals
-* 🎓 **Student Portal**: Lodge grievances with titles, descriptions, categories, priority, file attachments, and option to submit anonymously. Includes a notification panel, timeline history tracking, and direct discussion threads.
-* 🧑‍🏫 **Staff Portal**: View assigned complaints, update status to **In Progress**, post discussion remarks, **Resolve** them, or **Escalate** to the departmental HOD.
-* 🏢 **HOD Portal**: Oversee departmental grievances, **Resolve** escalated complaints, or **Escalate** to the Principal.
-* 👑 **Principal Portal**: College-wide view of escalated grievances. Actions include **Resolve** or **Close** ticket.
-* ⚙️ **Admin Portal**: Manage system users, provision roles and departments, and access the system ledger. Includes the **Admin Analytics Center** featuring visual performance charts.
+### 1. ✨ Google Gemini AI Copilot
+* **AI Ingest Analysis**: On grievance submission, Google's `gemini-2.0-flash` model analyzes the description to:
+  * Generate a **1-sentence Executive Summary** for handler dashboards.
+  * Extract the student's emotional **sentiment** (e.g., *ANXIOUS*, *FRUSTRATED*, *CONCERNED*).
+  * Automatically suggest the **Urgency Priority** (`LOW`, `MEDIUM`, `HIGH`).
+* **AI Resolution Drafter**: Provides staff, HOD, and principal users with a **"✨ AI Assistant: Draft Resolution Reply"** tool inside discussion feeds, instantly drafting polite, policy-aligned response templates based on the ticket description.
 
-### 2. Spring-Scheduled Auto-Escalation
-* **2 Days**: Sends an email + in-app reminder to the assigned Staff member.
-* **4 Days**: Automatically changes status to `ESCALATED_TO_HOD`, alerts the departmental HOD (email + in-app), and notifies the student.
-* **7 Days**: Automatically changes status to `ESCALATED_TO_PRINCIPAL`, alerts the Principal, and creates notifications.
-* **Test Mode**: Booting the server with `-Descalation.test.mode=true` shifts the days to **minutes** (2 mins, 4 mins, 7 mins) for rapid live demonstrations.
+### 2. Role-Based Portals
+* 🎓 **Student Portal**: Lodge grievances, upload attachments, track timelines, chat with support, and file anonymously.
+* 🧑‍🏫 **Staff Portal**: Update ticket status to **In Progress**, run the AI draft reply generator, **Resolve** complaints, or **Escalate** to the HOD.
+* 🏢 **HOD Portal**: Oversee department-level grievances, participate in discussions, and resolve or escalate tickets.
+* 👑 **Principal Portal**: College-wide operational visibility. Actions include **Resolve** or **Close** ticket.
+* ⚙️ **Admin Portal**: Provision users/departments and access the system ledger. Includes the **Admin Analytics Center** featuring visual performance charts.
 
-### 3. Discussion Feed / Conversations
-* Students and support staff can interact directly inside any ticket via a clean **Discussion Feed** chat tab. Comments trigger real-time in-app dashboard alerts.
+### 3. Auto-Escalation Engine
+* **2 Days**: Triggers transactional email and dashboard reminders to the assigned Staff.
+* **4 Days**: Changes status to `ESCALATED_TO_HOD`, notifying the student and HOD.
+* **7 Days**: Changes status to `ESCALATED_TO_PRINCIPAL`, notifying the student, HOD, and Principal.
+* **Test Mode**: Booting the server with `ESCALATION_TEST_MODE=true` shifts the days to **minutes** (2 mins, 4 mins, 7 mins) for rapid live demonstrations.
 
-### 4. Advanced Filtering & Urgency Tags
-* Urgency priorities (`LOW`, `MEDIUM`, `HIGH`) help organize tickets.
-* Multi-select filters allow sorting and filtering by **Status**, **Category**, **Priority**, **Department**, and **Anonymous status**.
-
-### 5. Analytics Dashboard
-* Rendered dynamically using Vanilla CSS and custom SVG elements:
-  * Horizontal progress indicators for department-wise complaints.
-  * Vertical monthly inflows bar graphs.
-  * Overall college resolution success gauge.
-  * System average response time tracker.
+### 4. Direct Discussion Feed / Conversations
+* Direct chat threads inside any ticket between students and support staff, supported by real-time notification alerts.
 
 ---
 
 ## 🚀 Manual Run Instructions
 
 ### Prerequisites
-* Node.js installed
-* MongoDB installed and active on port `27017` with connection string `mongodb://localhost:27017/`.
+* **Node.js** (v18+)
+* **MongoDB** active on port `27017` with connection string `mongodb://localhost:27017/`
+* **Google Gemini API Key** (from Google AI Studio)
 
 ### 1. Node.js Express Backend
-1. Open a terminal and navigate to:
+1. Navigate to:
    ```bash
    cd backend
    ```
-2. Install dependencies:
+2. Create `backend/.env` containing:
+   ```env
+   PORT=8080
+   MONGO_URI=mongodb://localhost:27017/grievance_connect
+   JWT_SECRET=your_jwt_secret_here
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_gmail@gmail.com
+   SMTP_PASS=your_app_password
+   ESCALATION_TEST_MODE=false
+   GEMINI_API_KEY=your_gemini_api_key
+   ```
+3. Install packages:
    ```bash
    npm install
    ```
-3. Start the application:
+4. Start the application:
    ```bash
    npm start
    ```
-   * **Note**: On first startup, the database `grievance_connect` will be created, and the default roles, departments, and admin user will be seeded automatically.
-   * **Auto-Escalation Test Mode**: To run with escalations in minutes rather than days, edit `backend/.env` and set `ESCALATION_TEST_MODE=true` before running.
+   * *Note*: On first boot, roles, departments, and the default admin user will be seeded automatically.
 
 ### 2. React Frontend
-1. Open a second terminal window and navigate to:
+1. Navigate to:
    ```bash
    cd Frontend
    ```
@@ -92,13 +101,8 @@ graph TD
 
 ---
 
-## 🧪 Testing and Verification
-
-### 1. Default Accounts
+## 🧪 Default Accounts
 * **Admin Login**:
   * **Email**: `admin@college.com`
   * **Password**: `admin123`
-* Use the **Create User** form on the Admin Dashboard to create student, staff, HOD, and principal accounts bound to specific departments to test the full lifecycle.
-
-### 2. Testing and Verification
-Verify that the Express server starts, connects to MongoDB, and serves endpoints on port `8080`. You can perform manual verification using the default admin credentials, lodging complaints, and checking auto-escalations on the UI.
+* Create other test profiles (Student, Staff, HOD, Principal) using the **Create User** form on the Admin Dashboard to test the full lifecycle.

@@ -52,7 +52,7 @@ const generateSummaryAndAnalysis = async (title, description) => {
     const responseText = result.response.text();
     return JSON.parse(responseText.trim());
   } catch (error) {
-    console.error('Gemini content generation error:', error.message);
+    console.warn(`[AI Warning] Gemini analysis failed (${error.message.includes('429') ? 'Quota Exceeded/Rate Limit' : error.message}). Using local fallback content.`);
     return {
       summary: description.slice(0, 80) + '...',
       suggestedPriority: 'MEDIUM',
@@ -83,7 +83,7 @@ const generateResolutionDraft = async (title, description, category) => {
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
   } catch (error) {
-    console.error('Gemini resolution draft error:', error.message);
+    console.warn(`[AI Warning] Gemini drafting failed (${error.message.includes('429') ? 'Quota Exceeded/Rate Limit' : error.message}). Using local fallback template.`);
     return `We have received your grievance regarding ${category} and are actively reviewing it. A departmental representative will get in touch with you shortly to resolve this issue.`;
   }
 };
