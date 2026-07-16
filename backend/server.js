@@ -42,6 +42,7 @@ const principalRoutes = require('./routes/principal');
 const publicRoutes = require('./routes/public');
 const filesRoutes = require('./routes/files');
 const commentsRoutes = require('./routes/comments');
+const notificationsRoutes = require('./routes/notifications');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -53,6 +54,7 @@ app.use('/api/principal', principalRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/files', filesRoutes);
 app.use('/api/grievances', commentsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

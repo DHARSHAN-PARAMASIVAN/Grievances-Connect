@@ -33,15 +33,14 @@ const upload = multer({ storage });
 
 // Protect all student endpoints
 router.use(authenticateToken);
-router.use(requireRole(['STUDENT']));
 
 // GET /api/student/dashboard
-router.get('/dashboard', (req, res) => {
+router.get('/dashboard', requireRole(['STUDENT']), (req, res) => {
   return res.send('Welcome to Student Dashboard');
 });
 
 // GET /api/student/staff
-router.get('/staff', async (req, res) => {
+router.get('/staff', requireRole(['STUDENT']), async (req, res) => {
   try {
     const student = req.user;
     if (!student.department) {
@@ -64,7 +63,7 @@ router.get('/staff', async (req, res) => {
 });
 
 // GET /api/student/grievances
-router.get('/grievances', async (req, res) => {
+router.get('/grievances', requireRole(['STUDENT']), async (req, res) => {
   try {
     const student = req.user;
     const grievances = await Grievance.find({ createdBy: student._id })
@@ -78,7 +77,7 @@ router.get('/grievances', async (req, res) => {
 });
 
 // POST /api/student/grievances (Handles both json and multipart/form-data)
-router.post('/grievances', upload.single('proofFile'), async (req, res) => {
+router.post('/grievances', requireRole(['STUDENT']), upload.single('proofFile'), async (req, res) => {
   const student = req.user;
 
   try {
@@ -192,7 +191,7 @@ router.post('/grievances', upload.single('proofFile'), async (req, res) => {
 });
 
 // GET /api/student/grievances/:id
-router.get('/grievances/:id', async (req, res) => {
+router.get('/grievances/:id', requireRole(['STUDENT']), async (req, res) => {
   try {
     const student = req.user;
     const grievance = await Grievance.findOne({ id: Number(req.params.id) })
@@ -233,7 +232,7 @@ router.get('/grievances/:id/history', async (req, res) => {
 });
 
 // GET /api/student/notifications
-router.get('/notifications', async (req, res) => {
+router.get('/notifications', requireRole(['STUDENT']), async (req, res) => {
   try {
     const student = req.user;
     const notifications = await Notification.find({ user: student._id })
@@ -248,7 +247,7 @@ router.get('/notifications', async (req, res) => {
 });
 
 // PUT /api/student/notifications/:id/read
-router.put('/notifications/:id/read', async (req, res) => {
+router.put('/notifications/:id/read', requireRole(['STUDENT']), async (req, res) => {
   try {
     const student = req.user;
     const notification = await Notification.findOne({ id: Number(req.params.id) }).populate('user');
