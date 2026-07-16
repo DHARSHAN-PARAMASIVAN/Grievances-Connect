@@ -1,0 +1,33 @@
+# Node modules and build output
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/.vite/
+
+# Gradle build output
+grievanceconnect/.gradle/
+grievanceconnect/build/
+grievanceconnect/bin/
+grievanceconnect/uploads/
+uploads/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Scratch and temp files
+scratch/
+*.log
+temp/
+
+# Backend node modules and env secrets
+backend/node_modules/
+backend/.env
+
