@@ -13,6 +13,8 @@ const mapGrievanceToResponse = (g) => {
     proofFilePath: g.proofFilePath,
     departmentName: g.department ? g.department.departmentName : null,
     priority: g.priority || 'MEDIUM',
+    aiSummary: g.aiSummary,
+    aiSentiment: g.aiSentiment,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt
   };

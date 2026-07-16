@@ -10,6 +10,7 @@ const Grievance = require('../models/Grievance');
 const GrievanceHistory = require('../models/GrievanceHistory');
 const Notification = require('../models/Notification');
 const emailService = require('../services/emailService');
+const aiService = require('../services/aiService');
 const { authenticateToken, requireRole } = require('../middleware/auth');
 const { mapGrievanceToResponse, mapNotificationToResponse, mapHistoryToResponse } = require('../utils/helpers');
 
@@ -95,6 +96,22 @@ router.post('/grievances', upload.single('proofFile'), async (req, res) => {
       return res.status(400).json({ message: 'Selected user is not a staff member' });
     }
 
+    // Call Gemini AI for automated summarization, sentiment analysis, and priority suggestions
+    let aiSummary = '';
+    let aiSentiment = '';
+    try {
+      const aiAnalysis = await aiService.generateSummaryAndAnalysis(title, description);
+      if (aiAnalysis) {
+        aiSummary = aiAnalysis.summary || '';
+        aiSentiment = aiAnalysis.sentiment || '';
+        if (aiAnalysis.suggestedPriority && ['LOW', 'MEDIUM', 'HIGH'].includes(aiAnalysis.suggestedPriority.toUpperCase())) {
+          priority = aiAnalysis.suggestedPriority.toUpperCase();
+        }
+      }
+    } catch (err) {
+      console.error('AI Ingest Analysis failed:', err.message);
+    }
+
     const grievance = new Grievance({
       title,
       description,
@@ -105,7 +122,9 @@ router.post('/grievances', upload.single('proofFile'), async (req, res) => {
       department: student.department ? student.department._id : null,
       assignedStaff: assignedStaff._id,
       currentHandler: assignedStaff._id,
-      priority: priority ? priority.toUpperCase() : 'MEDIUM'
+      priority: priority ? priority.toUpperCase() : 'MEDIUM',
+      aiSummary,
+      aiSentiment
     });
 
     if (!anonymous) {

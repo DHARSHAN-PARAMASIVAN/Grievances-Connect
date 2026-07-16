@@ -6,9 +6,35 @@ const GrievanceComment = require('../models/GrievanceComment');
 const Notification = require('../models/Notification');
 const { authenticateToken } = require('../middleware/auth');
 const { mapCommentToResponse } = require('../utils/helpers');
+const aiService = require('../services/aiService');
 
 // Protect all comments endpoints
 router.use(authenticateToken);
+
+// GET /api/grievances/:id/ai-suggest
+router.get('/:id/ai-suggest', async (req, res) => {
+  try {
+    if (req.user.role.roleName === 'STUDENT') {
+      return res.status(403).json({ message: 'Access denied: students cannot generate AI suggestions' });
+    }
+
+    const grievance = await Grievance.findOne({ id: Number(req.params.id) });
+    if (!grievance) {
+      return res.status(404).json({ message: 'Grievance not found' });
+    }
+
+    const aiDraft = await aiService.generateResolutionDraft(
+      grievance.title,
+      grievance.description,
+      grievance.category
+    );
+
+    return res.json({ aiDraft });
+  } catch (error) {
+    console.error('AI draft generation error:', error.message);
+    return res.status(500).json({ message: 'Failed to generate AI suggestion' });
+  }
+});
 
 // GET /api/grievances/:id/comments
 router.get('/:id/comments', async (req, res) => {

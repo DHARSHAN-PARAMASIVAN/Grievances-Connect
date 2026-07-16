@@ -342,6 +342,21 @@ function HodDashboard() {
                     <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))', textTransform: 'uppercase', fontWeight: 600 }}>Description</p>
                     <p style={{ whiteSpace: 'pre-wrap', color: 'hsl(var(--text-secondary))', fontSize: '0.9rem' }}>{selectedGrievance.description}</p>
                   </div>
+                  {selectedGrievance.aiSummary && (
+                    <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.15)', padding: '12px', borderRadius: '8px', marginTop: '12px' }}>
+                      <p style={{ fontSize: '0.72rem', color: '#818cf8', textTransform: 'uppercase', fontWeight: 700, margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        ✨ AI Executive Summary
+                      </p>
+                      <p style={{ color: 'hsl(var(--text-secondary))', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' }}>
+                        "{selectedGrievance.aiSummary}"
+                      </p>
+                      {selectedGrievance.aiSentiment && (
+                        <p style={{ fontSize: '0.68rem', color: 'hsl(var(--text-muted))', margin: '6px 0 0 0' }}>
+                          Detected Student Sentiment: <strong style={{ color: '#818cf8' }}>{selectedGrievance.aiSentiment}</strong>
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {selectedGrievance.proofFileName && (
                     <div>
                       <p style={{ fontSize: '0.75rem', color: 'hsl(var(--text-muted))', textTransform: 'uppercase', fontWeight: 600 }}>Attachment</p>

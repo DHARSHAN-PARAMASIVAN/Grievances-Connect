@@ -50,6 +50,12 @@ const grievanceSchema = new mongoose.Schema({
     required: true,
     default: false
   },
+  aiSummary: {
+    type: String
+  },
+  aiSentiment: {
+    type: String
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

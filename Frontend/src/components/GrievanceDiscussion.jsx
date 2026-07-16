@@ -44,6 +44,20 @@ function GrievanceDiscussion({ grievanceId }) {
     }
   };
 
+  const handleAiDraft = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/grievances/${grievanceId}/ai-suggest`);
+      setNewComment(res.data.aiDraft);
+      toast.success('AI resolution reply drafted!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate AI suggestion');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
@@ -103,6 +117,31 @@ function GrievanceDiscussion({ grievanceId }) {
           })
         )}
       </div>
+
+      {/* AI Assistant draft helper */}
+      {user.role !== 'STUDENT' && (
+        <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'flex-start', background: 'hsl(var(--bg-card))', borderTop: '1px solid hsl(var(--border) / 0.5)' }}>
+          <button
+            type="button"
+            onClick={handleAiDraft}
+            disabled={loading}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#818cf8',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 0'
+            }}
+          >
+            ✨ AI Assistant: Draft Resolution Reply
+          </button>
+        </div>
+      )}
 
       {/* Input Form */}
       <form onSubmit={handlePostComment} style={{ padding: '12px', borderTop: '1px solid hsl(var(--border))', background: 'hsl(var(--bg-card))', display: 'flex', gap: '8px' }}>
